@@ -1,0 +1,35 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Validate HTML
+      run: |
+        find . -name "*.html" -exec tidy -qe {} +
+
+    - name: Validate CSS
+      run: |
+        find . -name "*.css" -exec stylelint {} +
+
+    - name: Test SQL Scripts
+      run: |
+        echo "No SQL tests configured yet."
+
+    - name: Deploy (Optional)
+      if: success()
+      run: |
+        echo "Deploy steps go here."
+```
