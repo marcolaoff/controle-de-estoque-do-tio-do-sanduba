@@ -1,7 +1,7 @@
 CREATE DATABASE estoque_lanchonete;
- 
+
 USE estoque_lanchonete;
- 
+
 CREATE TABLE produtos (
 
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -15,4 +15,12 @@ CREATE TABLE produtos (
     descricao TEXT
 
 );
- 
+
+CREATE TABLE movimentacoes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tipo ENUM('entrada', 'saida') NOT NULL,
+    produto_id INT NOT NULL,
+    quantidade INT NOT NULL,
+    data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (produto_id) REFERENCES produtos(id)
+);
