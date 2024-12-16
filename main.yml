@@ -19,11 +19,11 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3
 
-      - name: Validate HTML
+    - name: Validate HTML
       run: |
         find ./frontend -name "*.html" -exec tidy -qe {} +
 
-        - name: Validate CSS
+    - name: Validate CSS
       run: |
         find ./frontend -name "*.css" -exec stylelint {} +
  
