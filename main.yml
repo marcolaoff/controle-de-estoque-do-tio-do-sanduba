@@ -1,7 +1,32 @@
 on:
+  # Aciona o fluxo de trabalho sempre que um evento de 'push' ocorrer
   push:
     branches:
+      # O fluxo de trabalho será executado apenas quando houver um 'push' para o ramo 'main'
       - main
+
+  # Aciona o fluxo de trabalho sempre que um evento de 'pull_request' ocorrer
   pull_request:
     branches:
+      # O fluxo de trabalho será executado apenas quando o destino do pull request for o ramo 'main'
       - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+ 
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+      - name: Validate HTML
+      run: |
+        find ./frontend -name "*.html" -exec tidy -qe {} +
+
+        - name: Validate CSS
+      run: |
+        find ./frontend -name "*.css" -exec stylelint {} +
+ 
+    - name: Test SQL Schema
+      run: |
+        mysql --user=root --password=root -e "source ./database/schema.sql"
