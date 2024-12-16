@@ -1,4 +1,4 @@
-# Controle de Estoque do tio do sanduba
+# Controle de Estoque
 
 ## Integrantes
 - [Marco Antonio Lourenci Silva](https://github.com/marcolaoff)
@@ -11,8 +11,8 @@
 ## Tecnologias Utilizadas
 - **Frontend**: HTML, CSS
 - **Banco de Dados**: SQL
+- **Back-end**: Java (Spring Boot)
 - **Ferramentas de Controle de Versão**: Git e GitHub
-- **Containerização**: Docker Desktop
 
 ## Descrição Geral do Sistema
 O sistema de controle de estoque será uma aplicação simples que permite:
@@ -26,22 +26,23 @@ O objetivo é desenvolver uma solução funcional e prática, que possa ser util
 ## Plano de Desenvolvimento por Etapas
 
 ### Segunda-feira
+- Configurar o repositório no GitHub.
 - Estruturar os arquivos iniciais do projeto (HTML e CSS).
 - Criar o esquema inicial do banco de dados SQL.
 - Configurar um pipeline básico de CI/CD no GitHub Actions.
 - Configurar o Docker Desktop para containerização do projeto.
+- Configurar o ambiente inicial do back-end em Java (Spring Boot).
 
 ### Terça-feira
 - Desenvolver a interface principal para exibição de produtos e estoque.
-- Implementar a funcionalidade de adicionar novos produtos.
-- Testar e ajustar a integração entre o frontend e o banco de dados.
-- Criar um arquivo Dockerfile e docker-compose para orquestrar os serviços.
+- Implementar a funcionalidade de adicionar novos produtos no front-end.
+- Desenvolver o back-end para gerenciar os produtos no banco de dados.
+- Testar e ajustar a integração entre o front-end e o back-end.
 
 ### Quarta-feira
-- Implementar as funcionalidades de entrada e saída de produtos.
-- Desenvolver a geração de relatórios.
+- Implementar as funcionalidades de entrada e saída de produtos no sistema.
+- Desenvolver a geração de relatórios no back-end e exibir no front-end.
 - Finalizar e documentar o projeto no README.
-- Testar o pipeline de CI/CD atualizado com integração de Docker.
 
 ## Histórias de Usuários
 
