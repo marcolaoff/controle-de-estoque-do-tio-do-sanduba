@@ -23,5 +23,4 @@ CREATE TABLE movimentacoes (
     quantidade INT NOT NULL,
     data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (produto_id) REFERENCES produtos(id)
-
 );
