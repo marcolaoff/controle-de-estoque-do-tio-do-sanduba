@@ -1,0 +1,41 @@
+on:
+  # Aciona o fluxo de trabalho sempre que um evento de 'push' ocorrer
+  push:
+    branches:
+      # O fluxo de trabalho será executado apenas quando houver um 'push' para o ramo 'main'
+      - main
+
+  # Aciona o fluxo de trabalho sempre que um evento de 'pull_request' ocorrer
+  pull_request:
+    branches:
+      # O fluxo de trabalho será executado apenas quando o destino do pull request for o ramo 'main'
+      - main
+
+jobs:
+  # Define o job (tarefa) chamado 'build', que será executado no ambiente configurado
+  build:
+    # Especifica o sistema operacional onde o job será executado. Neste caso, Ubuntu mais recente
+    runs-on: ubuntu-latest
+
+    steps:
+      # Passo 1: Realiza o checkout (clonagem) do código fonte do repositório
+      - name: Checkout Code
+        uses: actions/checkout@v3  # Ação padrão para fazer o checkout do repositório
+
+      # Passo 2: Valida os arquivos HTML encontrados na pasta './frontend'
+      - name: Validate HTML
+        run: |
+          # Comando find busca todos os arquivos .html dentro de './frontend' e executa o 'tidy' para validar
+          find ./frontend -name "*.html" -exec tidy -qe {} +
+
+      # Passo 3: Valida os arquivos CSS encontrados na pasta './frontend'
+      - name: Validate CSS
+        run: |
+          # Comando find busca todos os arquivos .css dentro de './frontend' e executa o 'stylelint' para validar
+          find ./frontend -name "*.css" -exec stylelint {} +
+
+      # Passo 4: Executa testes no esquema SQL, usando o arquivo 'schema.sql'
+      - name: Test SQL Schema
+        run: |
+          # Comando mysql executa o script SQL 'schema.sql' no banco de dados local
+          mysql --user=root --password=root -e "source ./database/schema.sql"
