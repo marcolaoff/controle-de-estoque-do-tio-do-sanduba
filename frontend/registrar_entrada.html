@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html
+lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Entrada</title>
+    <link rel="stylesheet" href="styles.css"></head>
+    <body>
+        <h1>Registrar Entrada de Produto</h1>
+        <form id="formEntrada">
+            <label for="produtoId">ID do Produto:</label>
+            <input type="number" id="produtoId" required>
+            <label for="quantidade">Quantidade de Entrada:</label>
+            <input type="number" id="quantidade" required>
+            <button type="submit">Registrar</button>
+        </form>
+        <script>document.getElementById('formEntrada').addEventListener('submit', async function (e) {             e.preventDefault();             const produtoId = document.getElementById('produtoId').value;             const quantidade = parseInt(document.getElementById('quantidade').value);             const response = await fetch(`http://localhost:8080/produtos/${produtoId}/entrada`, {                 method: 'POST',                 headers: { 'Content-Type': 'application/json' },                 body: JSON.stringify(quantidade),             });             if (response.ok) { alert('Entrada registrada com sucesso!'); } else { alert('Erro ao registrar entrada.'); } }); </script>
+    </body>
+    </html>
