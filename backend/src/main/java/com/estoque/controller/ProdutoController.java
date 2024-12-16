@@ -21,3 +21,8 @@ public class ProdutoController {
 }
 
 @GetMappingpublic ResponseEntity<List<Produto>> listarProdutos() {     List<Produto> produtos = produtoRepository.findAll();    return ResponseEntity.ok(produtos); }
+
+@PostMapping("/{id}/entrada")public ResponseEntity<Produto> registrarEntrada(@PathVariable Long id, @RequestBody int quantidade) {     Produto produto = produtoRepository.findById(id).orElseThrow(() -> new RuntimeException("Produto não encontrado"));     produto.setQuantidade(produto.getQuantidade() + quantidade);    Produto produtoAtualizado = produtoRepository.save(produto); return ResponseEntity.ok(produtoAtualizado); }
+
+
+@PostMapping("/{id}/entrada")public ResponseEntity<Produto> registrarEntrada(@PathVariable Long id, @RequestBody int quantidade) {     Produto produto = produtoRepository.findById(id).orElseThrow(() -> new RuntimeException("Produto não encontrado"));     produto.setQuantidade(produto.getQuantidade() + quantidade);    Produto produtoAtualizado = produtoRepository.save(produto); return ResponseEntity.ok(produtoAtualizado); }
