@@ -19,3 +19,5 @@ public class ProdutoController {
         return ResponseEntity.ok(novoProduto);
     }
 }
+
+@GetMappingpublic ResponseEntity<List<Produto>> listarProdutos() {     List<Produto> produtos = produtoRepository.findAll();    return ResponseEntity.ok(produtos); }
