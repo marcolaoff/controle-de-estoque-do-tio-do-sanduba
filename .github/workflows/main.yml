@@ -34,46 +34,53 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v3
 
-      # 2. Configurar Java e Maven
+      # 2. Instalar Docker Compose
+      - name: Instalar Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.26.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+
+      # 3. Configurar Java e Maven
       - name: Configurar Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # 3. Build da aplicação e geração do JAR
+      # 4. Build da aplicação e geração do JAR
       - name: Build da aplicação com Maven
         run: |
           cd backend
           mvn clean package -DskipTests
 
-      # 4. Testar aplicação rodando com Docker Compose
+      # 5. Subir containers com Docker Compose
       - name: Subir containers com Docker Compose
         run: |
           cd backend
           docker-compose up --build -d
 
-      # 5. Testar endpoint da aplicação
+      # 6. Testar endpoint da aplicação
       - name: Testar aplicação no endpoint "/produtos"
         run: |
           sleep 20  # Aguarda a aplicação iniciar
           curl -f http://localhost:8080/produtos || exit 1
 
-      # 6. Salvar o JAR gerado como artefato
+      # 7. Salvar o JAR gerado como artefato
       - name: Publicar o JAR como artefato
         uses: actions/upload-artifact@v3
         with:
           name: backend-jar
           path: backend/target/backend-1.0.0.jar
 
-      # 7. Logs dos containers em caso de falha
+      # 8. Logs dos containers em caso de falha
       - name: Logs dos containers
         if: failure()
         run: |
           cd backend
           docker-compose logs
 
-      # 8. Parar e limpar os containers
+      # 9. Parar e limpar os containers
       - name: Parar containers e limpar ambiente
         run: |
           cd backend
