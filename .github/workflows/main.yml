@@ -47,11 +47,11 @@ jobs:
       - name: Executar testes automatizados
         run: mvn test --file backend/pom.xml
 
-      # 5. Validar HTML e CSS (Front-End)
+      # 5. Validar HTML e CSS (Arquivos no caminho correto)
       - name: Validar HTML e CSS
         run: |
-          npx html-validator-cli --file frontend/index.html
-          npx stylelint "frontend/**/*.css"
+          npx html-validator-cli --file backend/src/main/resources/static/index.html
+          npx stylelint "backend/src/main/resources/static/**/*.css"
 
       # 6. Resultado Final
       - name: Resultado dos Testes
