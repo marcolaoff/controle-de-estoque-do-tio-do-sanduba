@@ -37,3 +37,9 @@ public ResponseEntity<Produto> registrarSaida(@PathVariable Long id, @RequestBod
     Produto produtoAtualizado = produtoRepository.save(produto);
     return ResponseEntity.ok(produtoAtualizado);
 }
+
+@GetMapping("/relatorio")
+public ResponseEntity<List<Produto>> gerarRelatorio() {
+    List<Produto> produtos = produtoRepository.findAll();
+    return ResponseEntity.ok(produtos);
+}
