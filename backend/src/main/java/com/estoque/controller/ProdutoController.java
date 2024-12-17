@@ -43,3 +43,14 @@ public ResponseEntity<List<Produto>> gerarRelatorio() {
     List<Produto> produtos = produtoRepository.findAll();
     return ResponseEntity.ok(produtos);
 }
+
+@PutMapping("/{id}")
+public ResponseEntity<Produto> editarProduto(@PathVariable Long id, @RequestBody Produto produtoAtualizado) {
+    Produto produto = produtoRepository.findById(id).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+    produto.setNome(produtoAtualizado.getNome());
+    produto.setQuantidade(produtoAtualizado.getQuantidade());
+    produto.setPreco(produtoAtualizado.getPreco());
+    produto.setDescricao(produtoAtualizado.getDescricao());
+    Produto produtoEditado = produtoRepository.save(produto);
+    return ResponseEntity.ok(produtoEditado);
+}
