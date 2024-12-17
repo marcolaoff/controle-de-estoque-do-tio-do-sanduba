@@ -1,59 +1,47 @@
-name: CI/CD Pipeline - Testes Automatizados
+name: CI/CD Pipeline - Docker Test
 
 on:
-  pull_request:
+  push:
     branches:
       - main
-  push:
+  pull_request:
     branches:
       - main
 
 jobs:
-  test:
-    name: Testar e Validar Aplicação
+  build-and-run:
+    name: Build e Teste da Aplicação via Docker
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: estoque_tio_sanduba
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-
     steps:
-      # 1. Checkout do código
-      - name: Checkout do código
+      # 1. Checkout do código-fonte
+      - name: Checkout do repositório
         uses: actions/checkout@v3
 
-      # 2. Configuração do Java
-      - name: Configurar Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      # 3. Instalar dependências do Maven
-      - name: Instalar dependências do Maven
-        run: mvn install --file backend/pom.xml
-
-      # 4. Rodar Testes Automatizados do Back-End
-      - name: Executar testes automatizados
-        run: mvn test --file backend/pom.xml
-
-      # 5. Validar HTML e CSS (Front-End)
-      - name: Validar HTML e CSS
+      # 2. Configurar Docker no ambiente
+      - name: Configurar Docker
         run: |
-          npx html-validator-cli --file backend/src/main/resources/static/index.html
-          npx stylelint "backend/src/main/resources/static/**/*.css"
+          docker --version
+          docker-compose --version
 
-      # 6. Resultado Final em Caso de Falha
-      - name: Resultado dos Testes
-        if: failure()
-        run: echo "❌ Erro: Pipeline falhou devido a testes que não passaram!"
+      # 3. Build da Imagem Docker
+      - name: Build da imagem Docker
+        run: |
+          docker build -t backend-app -f Dockerfile .
+
+      # 4. Rodar o container
+      - name: Rodar container Docker
+        run: |
+          docker run -d -p 8080:8080 --name backend-app backend-app
+
+      # 5. Testar se a aplicação está rodando
+      - name: Testar aplicação
+        run: |
+          sleep 10  # Aguarda a aplicação subir
+          curl -f http://localhost:8080/actuator/health || exit 1
+
+      # 6. Parar e Remover container
+      - name: Parar container
+        run: |
+          docker stop backend-app
+          docker rm backend-app
