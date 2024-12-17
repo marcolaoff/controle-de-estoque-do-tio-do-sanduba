@@ -44,4 +44,4 @@ jobs:
       - name: Parar container
         run: |
           docker stop backend-app
-          docker rm backend-app
+
