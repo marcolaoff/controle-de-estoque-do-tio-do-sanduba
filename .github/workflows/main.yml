@@ -22,10 +22,10 @@ jobs:
         ports:
           - 3306:3306
         options: >-
-          --health-cmd "mysqladmin ping --silent" 
-          --health-interval 10s 
-          --health-timeout 5s 
-          --health-retries 3
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
     steps:
       # 1. Checkout do código
@@ -47,7 +47,13 @@ jobs:
       - name: Executar testes automatizados
         run: mvn test --file backend/pom.xml
 
-      # 5. Resultado Final
+      # 5. Validar HTML e CSS (Front-End)
+      - name: Validar HTML e CSS
+        run: |
+          npx html-validator-cli --file backend/src/main/resources/static/index.html
+          npx stylelint "backend/src/main/resources/static/**/*.css"
+
+      # 6. Resultado Final em Caso de Falha
       - name: Resultado dos Testes
         if: failure()
         run: echo "❌ Erro: Pipeline falhou devido a testes que não passaram!"
