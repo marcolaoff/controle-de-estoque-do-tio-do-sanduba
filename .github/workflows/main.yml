@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - main
-      - marcoantonio   # Adicionando branch marcoantonio
+      - marcoantonio
   pull_request:
     branches:
       - main
-      - marcoantonio   # Adicionando branch marcoantonio
+      - marcoantonio
 
 jobs:
   build_and_test:
@@ -34,42 +34,49 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v3
 
-      # 2. Configuração do Java
+      # 2. Configurar Java
       - name: Configurar Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # 3. Instalação de dependências
+      # 3. Instalar Docker Compose
+      - name: Instalar Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.26.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+
+      # 4. Instalação de dependências Maven
       - name: Instalar dependências do Maven
         run: |
           cd backend
           mvn clean install -DskipTests
 
-      # 4. Build da aplicação e geração do JAR
+      # 5. Build da aplicação com Maven
       - name: Build da aplicação com Maven
         run: |
           cd backend
           mvn clean package -DskipTests
 
-      # 5. Subir containers com Docker Compose
+      # 6. Subir containers com Docker Compose
       - name: Subir containers com Docker Compose
         run: |
           cd backend
           docker-compose up --build -d
 
-      # 6. Verificar status dos containers
+      # 7. Verificar status dos containers
       - name: Verificar status dos containers
         run: docker ps -a
 
-      # 7. Testar endpoint principal da aplicação
+      # 8. Testar endpoint da aplicação
       - name: Testar endpoint da aplicação
         run: |
           sleep 20  # Aguarda a aplicação subir
           curl -f http://localhost:8080/produtos || exit 1
 
-      # 8. Parar e Remover containers
+      # 9. Parar e Remover containers
       - name: Parar e remover containers
         run: |
           cd backend
