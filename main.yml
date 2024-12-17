@@ -1,41 +1,59 @@
-on:
-  # Aciona o fluxo de trabalho sempre que um evento de 'push' ocorrer
-  push:
-    branches:
-      # O fluxo de trabalho será executado apenas quando houver um 'push' para o ramo 'main'
-      - main
+name: CI/CD Pipeline - Testes Automatizados
 
-  # Aciona o fluxo de trabalho sempre que um evento de 'pull_request' ocorrer
+on:
   pull_request:
     branches:
-      # O fluxo de trabalho será executado apenas quando o destino do pull request for o ramo 'main'
+      - main
+  push:
+    branches:
       - main
 
 jobs:
-  # Define o job (tarefa) chamado 'build', que será executado no ambiente configurado
-  build:
-    # Especifica o sistema operacional onde o job será executado. Neste caso, Ubuntu mais recente
+  test:
+    name: Testar e Validar Aplicação
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: estoque_tio_sanduba
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
-      # Passo 1: Realiza o checkout (clonagem) do código fonte do repositório
-      - name: Checkout Code
-        uses: actions/checkout@v3  # Ação padrão para fazer o checkout do repositório
+      # 1. Checkout do código
+      - name: Checkout do código
+        uses: actions/checkout@v3
 
-      # Passo 2: Valida os arquivos HTML encontrados na pasta './frontend'
-      - name: Validate HTML
-        run: |
-          # Comando find busca todos os arquivos .html dentro de './frontend' e executa o 'tidy' para validar
-          find ./frontend -name "*.html" -exec tidy -qe {} +
+      # 2. Configuração do Java
+      - name: Configurar Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-      # Passo 3: Valida os arquivos CSS encontrados na pasta './frontend'
-      - name: Validate CSS
-        run: |
-          # Comando find busca todos os arquivos .css dentro de './frontend' e executa o 'stylelint' para validar
-          find ./frontend -name "*.css" -exec stylelint {} +
+      # 3. Instalar dependências do Maven
+      - name: Instalar dependências do Maven
+        run: mvn install --file backend/pom.xml
 
-      # Passo 4: Executa testes no esquema SQL, usando o arquivo 'schema.sql'
-      - name: Test SQL Schema
+      # 4. Rodar Testes Automatizados do Back-End
+      - name: Executar testes automatizados
+        run: mvn test --file backend/pom.xml
+
+      # 5. Validar HTML e CSS (Arquivos movidos para static)
+      - name: Validar HTML e CSS
         run: |
-          # Comando mysql executa o script SQL 'schema.sql' no banco de dados local
-          mysql --user=root --password=root -e "source ./database/schema.sql"
+          npx html-validator-cli --file backend/src/main/resources/static/index.html
+          npx stylelint "backend/src/main/resources/static/**/*.css"
+
+      # 6. Resultado Final
+      - name: Resultado dos Testes
+        if: failure()
+        run: echo "❌ Erro: Pipeline falhou devido a testes que não passaram!"
