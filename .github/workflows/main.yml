@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - main
-      - marcoantonio   # Adicione sua branch aqui
+      - marcoantonio   # Branch adicional
   pull_request:
     branches:
       - main
-      - marcoantonio   # Adicione sua branch aqui
+      - marcoantonio   # Branch adicional
 
 jobs:
   test:
@@ -27,27 +27,25 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
-      # 3. Build da aplicação usando Docker
-      - name: Build e execução da aplicação no Docker
-        run: docker-compose up --build -d
+      # 3. Verificar arquivos no diretório backend
+      - name: Listar arquivos no diretório backend
+        run: ls -l backend
 
-      # 4. Verificar se a aplicação está rodando
+      # 4. Build e execução da aplicação usando Docker Compose
+      - name: Build e subir aplicação com Docker Compose
+        run: docker-compose -f backend/docker-compose.yml up --build -d
+
+      # 5. Verificar status dos containers
       - name: Verificar status dos containers
-        run: docker ps -a
+        run: docker-compose -f backend/docker-compose.yml ps
 
-      # 4. Rodar o container
-      - name: Rodar container Docker
+      # 6. Testar aplicação com Curl
+      - name: Testar aplicação rodando
         run: |
-          docker run -d -p 8080:8080 --name backend-app backend-app
-
-      # 5. Testar se a aplicação está rodando
-      - name: Testar aplicação
-        run: |
-          sleep 10  # Aguarda a aplicação subir
+          sleep 20  # Aguarda a aplicação iniciar
           curl -f http://localhost:8080/actuator/health || exit 1
 
-      # 6. Parar e Remover container
-      - name: Parar container
-        run: |
-          docker stop backend-app
-          docker rm backend-app
+      # 7. Mostrar logs da aplicação (em caso de falha)
+      - name: Logs da aplicação
+        if: failure()
+        run: docker-compose -f backend/docke
