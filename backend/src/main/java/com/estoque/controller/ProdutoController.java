@@ -26,3 +26,14 @@ public class ProdutoController {
 
 
 @PostMapping("/{id}/entrada")public ResponseEntity<Produto> registrarEntrada(@PathVariable Long id, @RequestBody int quantidade) {     Produto produto = produtoRepository.findById(id).orElseThrow(() -> new RuntimeException("Produto não encontrado"));     produto.setQuantidade(produto.getQuantidade() + quantidade);    Produto produtoAtualizado = produtoRepository.save(produto); return ResponseEntity.ok(produtoAtualizado); }
+
+@PostMapping("/{id}/saida")
+public ResponseEntity<Produto> registrarSaida(@PathVariable Long id, @RequestBody int quantidade) {
+    Produto produto = produtoRepository.findById(id).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+    if (produto.getQuantidade() < quantidade) {
+        throw new RuntimeException("Quantidade insuficiente no estoque");
+    }
+    produto.setQuantidade(produto.getQuantidade() - quantidade);
+    Produto produtoAtualizado = produtoRepository.save(produto);
+    return ResponseEntity.ok(produtoAtualizado);
+}
