@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editar Produto</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<h1>Editar Produto</h1>
+<form id="formEditar">
+<label for="produtoId">ID do Produto:</label>
+<input type="number" id="produtoId" required>
+ 
+        <label for="nome">Nome:</label>
+<input type="text" id="nome" required>
+ 
+        <label for="quantidade">Quantidade:</label>
+<input type="number" id="quantidade" required>
+ 
+        <label for="preco">Preço:</label>
+<input type="number" id="preco" step="0.01" required>
+ 
+        <label for="descricao">Descrição:</label>
+<textarea id="descricao"></textarea>
+ 
+        <button type="submit">Salvar Alterações</button>
+</form>
+ 
+    <script>
+        document.getElementById('formEditar').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const produtoId = document.getElementById('produtoId').value;
+            const produtoAtualizado = {
+                nome: document.getElementById('nome').value,
+                quantidade: document.getElementById('quantidade').value,
+                preco: document.getElementById('preco').value,
+                descricao: document.getElementById('descricao').value,
+            };
+ 
+            const response = await fetch(`http://localhost:8080/produtos/${produtoId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(produtoAtualizado),
+            });
+ 
+            if (response.ok) {
+                alert('Produto editado com sucesso!');
+            } else {
+                alert('Erro ao editar produto.');
+            }
+        });
+</script>
+</body>
+</html>
