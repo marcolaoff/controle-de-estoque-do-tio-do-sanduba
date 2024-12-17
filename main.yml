@@ -55,7 +55,7 @@ jobs:
 
       # 6. Resultado Final - Opcional
       - name: Resultado dos Testes
-        if: failure()
+        if: ${{ failure() }}
         run: |
           echo "❌ Erro: Pipeline falhou devido a testes que não passaram!"
           exit 1
