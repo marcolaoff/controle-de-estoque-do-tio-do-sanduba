@@ -47,23 +47,13 @@ jobs:
       - name: Executar testes automatizados
         run: mvn test --file backend/pom.xml
 
-      # 5. Configurar Node.js para validação
-      - name: Configurar Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-
-      # 6. Instalar dependências do Node.js
-      - name: Instalar dependências do Node.js
-        run: npm install -g html-validator-cli stylelint
-
-      # 7. Validar HTML e CSS (Front-End)
+      # 5. Validar HTML e CSS (Arquivos movidos para static)
       - name: Validar HTML e CSS
         run: |
-          npx html-validator-cli --file frontend/index.html
-          npx stylelint "frontend/**/*.css"
+          npx html-validator-cli --file backend/src/main/resources/static/index.html
+          npx stylelint "backend/src/main/resources/static/**/*.css"
 
-      # 8. Resultado Final
+      # 6. Resultado Final
       - name: Resultado dos Testes
         if: failure()
         run: echo "❌ Erro: Pipeline falhou devido a testes que não passaram!"
