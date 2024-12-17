@@ -27,25 +27,24 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
-      # 3. Verificar arquivos no diretório backend
-      - name: Listar arquivos no diretório backend
-        run: ls -l backend
-
-      # 4. Build e execução da aplicação usando Docker Compose
+      # 3. Build e subir aplicação com Docker Compose
       - name: Build e subir aplicação com Docker Compose
         run: docker-compose -f backend/docker-compose.yml up --build -d
 
-      # 5. Verificar status dos containers
-      - name: Verificar status dos containers
-        run: docker-compose -f backend/docker-compose.yml ps
+      # 4. Aguardar aplicação iniciar
+      - name: Aguarda aplicação iniciar
+        run: sleep 20
 
-      # 6. Testar aplicação com Curl
-      - name: Testar aplicação rodando
+      # 5. Testar aplicação no endpoint "/produtos"
+      - name: Testar aplicação rodando no endpoint "/produtos"
         run: |
-          sleep 20  # Aguarda a aplicação iniciar
-          curl -f http://localhost:8080/actuator/health || exit 1
+          curl -f http://localhost:8080/produtos || exit 1
 
-      # 7. Mostrar logs da aplicação (em caso de falha)
-      - name: Logs da aplicação
+      # 6. Logs da aplicação em caso de erro
+      - name: Logs dos containers
         if: failure()
-        run: docker-compose -f backend/docke
+        run: docker-compose -f backend/docker-compose.yml logs
+
+      # 7. Parar e remover containers
+      - name: Parar containers e limpar ambiente
+        run: docker-compose -f backend/docker-compose.yml down
