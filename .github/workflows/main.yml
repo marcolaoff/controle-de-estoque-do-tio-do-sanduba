@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - marcoantonio   # Adicione sua branch aqui
   pull_request:
     branches:
       - main
+      - marcoantonio   # Adicione sua branch aqui
 
 jobs:
   build-and-run:
