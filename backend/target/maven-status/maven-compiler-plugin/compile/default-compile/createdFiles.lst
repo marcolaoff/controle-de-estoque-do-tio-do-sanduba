@@ -1,0 +1,6 @@
+com\estoque\ControleDeEstoqueApplication.class
+com\estoque\controller\ProdutoController.class
+com\estoque\model\Produto.class
+com\estoque\repository\ProdutoRepository.class
+com\estoque\config\WebConfig$1.class
+com\estoque\config\WebConfig.class

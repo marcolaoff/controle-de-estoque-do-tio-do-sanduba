@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Saída</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Registrar Saída de Produto</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="listar_produtos.html">Listar Produtos</a></li>
+            </ul>
+        </nav>
+    </header>
+    <form id="formSaida">
+        <label for="produtoId">ID do Produto:</label>
+        <input type="number" id="produtoId" required>
+
+        <label for="quantidade">Quantidade de Saída:</label>
+        <input type="number" id="quantidade" required>
+
+        <button type="submit">Registrar</button>
+    </form>
+
+    <script>
+        document.getElementById('formSaida').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const produtoId = document.getElementById('produtoId').value;
+            const quantidade = parseInt(document.getElementById('quantidade').value);
+
+            const response = await fetch(`http://localhost:8080/produtos/${produtoId}/saida`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(quantidade),
+            });
+
+            if (response.ok) {
+                alert('Saída registrada com sucesso!');
+            } else {
+                alert('Erro ao registrar saída.');
+            }
+        });
+    </script>
+</body>
+</html>
