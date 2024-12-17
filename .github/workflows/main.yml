@@ -11,25 +11,29 @@ on:
       - marcoantonio   # Adicione sua branch aqui
 
 jobs:
-  build-and-run:
-    name: Build e Teste da Aplicação via Docker
+  test:
+    name: Testar e Validar Aplicação
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout do código-fonte
-      - name: Checkout do repositório
+      # 1. Checkout do código
+      - name: Checkout do código
         uses: actions/checkout@v3
 
-      # 2. Configurar Docker no ambiente
-      - name: Configurar Docker
+      # 2. Instalar Docker Compose
+      - name: Instalar Docker Compose
         run: |
-          docker --version
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.26.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
-      # 3. Build da Imagem Docker
-      - name: Build da imagem Docker
-        run: |
-          docker build -t backend-app -f Dockerfile .
+      # 3. Build da aplicação usando Docker
+      - name: Build e execução da aplicação no Docker
+        run: docker-compose up --build -d
+
+      # 4. Verificar se a aplicação está rodando
+      - name: Verificar status dos containers
+        run: docker ps -a
 
       # 4. Rodar o container
       - name: Rodar container Docker
