@@ -47,7 +47,7 @@ jobs:
       - name: Executar testes automatizados
         run: mvn test --file backend/pom.xml
 
-      # 5. Validar HTML e CSS (Arquivos movidos para static)
+      # 5. Validar HTML e CSS (Arquivos no caminho correto)
       - name: Validar HTML e CSS
         run: |
           npx html-validator-cli --file backend/src/main/resources/static/index.html
