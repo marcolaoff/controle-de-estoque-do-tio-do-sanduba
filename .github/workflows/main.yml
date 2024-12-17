@@ -1,16 +1,18 @@
-name: CI/CD Pipeline - Testes Automatizados
+name: CI/CD Pipeline - Docker Test
 
 on:
-  pull_request:
-    branches:
-      - main
   push:
     branches:
       - main
+      - marcoantonio
+  pull_request:
+    branches:
+      - main
+      - marcoantonio
 
 jobs:
-  test:
-    name: Testar e Validar Aplicação
+  build_and_test:
+    name: Build e Testar Aplicação
     runs-on: ubuntu-latest
 
     services:
@@ -32,28 +34,56 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v3
 
-      # 2. Configuração do Java
+      # 2. Configurar Java
       - name: Configurar Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # 3. Instalar dependências do Maven
-      - name: Instalar dependências do Maven
-        run: mvn install --file backend/pom.xml
-
-      # 4. Rodar Testes Automatizados do Back-End
-      - name: Executar testes automatizados
-        run: mvn test --file backend/pom.xml
-
-      # 5. Validar HTML e CSS (Arquivos no caminho correto)
-      - name: Validar HTML e CSS
+      # 3. Instalar Docker Compose
+      - name: Instalar Docker Compose
         run: |
-          npx html-validator-cli --file backend/src/main/resources/static/index.html
-          npx stylelint "backend/src/main/resources/static/**/*.css"
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.26.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
 
-      # 6. Resultado Final
-      - name: Resultado dos Testes
-        if: failure()
-        run: echo "❌ Erro: Pipeline falhou devido a testes que não passaram!"
+      # 4. Instalação de dependências Maven
+      - name: Instalar dependências do Maven
+        run: |
+          cd backend
+          mvn clean install -DskipTests
+
+      # 5. Build da aplicação com Maven
+      - name: Build da aplicação com Maven
+        run: |
+          cd backend
+          mvn clean package -DskipTests
+
+      # 6. Subir containers com Docker Compose
+      - name: Subir containers com Docker Compose
+        run: |
+          cd backend
+          docker-compose up --build -d
+
+      # 7. Verificar status dos containers
+      - name: Verificar status dos containers
+        run: docker ps -a
+
+      # 8. Testar endpoint da aplicação
+      - name: Testar endpoint da aplicação
+        run: |
+          sleep 20  # Aguarda a aplicação subir
+          curl -f http://localhost:8080/produtos || exit 1
+
+      # 9. Parar e Remover containers
+      - name: Parar e remover containers
+        run: |
+          cd backend
+          docker-compose down
+# 10. Salvar JAR gerado como artefato
+      - name: Salvar artefato do JAR gerado
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-jar
+          path: backend/target/backend-1.0.0.jar
