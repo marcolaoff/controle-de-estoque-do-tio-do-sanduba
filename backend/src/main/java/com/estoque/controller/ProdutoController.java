@@ -1,18 +1,31 @@
 package com.estoque.controller;
 
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.estoque.model.Produto;
 import com.estoque.repository.ProdutoRepository;
-
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.*;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -74,6 +87,31 @@ public class ProdutoController {
             } else {
                 return ResponseEntity.badRequest().body("Quantidade insuficiente em estoque.");
             }
+        } else {
+            return ResponseEntity.badRequest().body("Produto não encontrado.");
+        }
+    }
+
+    // Editar produto
+    @PutMapping("/{id}")
+    public ResponseEntity<?> editarProduto(@PathVariable Long id, @RequestBody Produto produtoAtualizado) {
+        Optional<Produto> produtoExistente = produtoRepository.findById(id);
+
+        if (produtoExistente.isPresent()) {
+            Produto produto = produtoExistente.get();
+            produto.setNome(produtoAtualizado.getNome());
+            produto.setQuantidade(produtoAtualizado.getQuantidade());
+            produto.setPreco(produtoAtualizado.getPreco());
+            produto.setDescricao(produtoAtualizado.getDescricao());
+            produtoRepository.save(produto);
+
+            movimentacoes.add(Map.of(
+                "tipo", "edicao",
+                "nome", produto.getNome(),
+                "quantidade", produto.getQuantidade()
+            ));
+
+            return ResponseEntity.ok("Produto atualizado com sucesso!");
         } else {
             return ResponseEntity.badRequest().body("Produto não encontrado.");
         }
