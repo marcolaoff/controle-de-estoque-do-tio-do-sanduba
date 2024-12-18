@@ -3,42 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatório de Estoque</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Relatório de Produtos</title>
+    <style>
+        /* Estilização geral */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 15px 10px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin: 0 10px;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        table {
+            width: 90%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        table th {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 20px;
+            color: #007bff;
+        }
+
+        /* Botão estilizado */
+        .btn-relatorio {
+            display: block;
+            width: 250px;
+            margin: 20px auto;
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-relatorio:hover {
+            background-color: #218838;
+        }
+
+        .empty-message {
+            text-align: center;
+            font-size: 18px;
+            color: #dc3545;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <h1>Relatório de Estoque</h1>
+        <h1>Relatório de Produtos</h1>
         <nav>
             <ul>
                 <li><a href="index.html">Home</a></li>
-                <li><a href="listar_produtos.html">Listar Produtos</a></li>
+                <li><a href="adicionar_produto.html">Adicionar Produto</a></li>
             </ul>
         </nav>
     </header>
-    <table border="1">
+
+    <h2>Movimentação de Produtos</h2>
+
+    <table id="tabelaRelatorio" style="display: none;">
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Nome</th>
-                <th>Quantidade</th>
-                <th>Preço</th>
-                <th>Descrição</th>
+                <th>Quantidade Entrada</th>
+                <th>Quantidade Saída</th>
+                <th>Quantidade Final</th>
             </tr>
         </thead>
-        <tbody id="relatorioProdutos"></tbody>
+        <tbody id="tabelaMovimentacao"></tbody>
     </table>
+
+    <div id="mensagemVazia" class="empty-message" style="display: none;">
+        Nenhuma movimentação encontrada para os produtos.
+    </div>
+
+    <button class="btn-relatorio" onclick="baixarPDF()">Baixar Relatório em PDF</button>
 
     <script>
         async function carregarRelatorio() {
-            const response = await fetch('http://localhost:8080/produtos/relatorio');
-            const produtos = await response.json();
+            const tabela = document.getElementById("tabelaRelatorio");
+            const tabelaBody = document.getElementById("tabelaMovimentacao");
+            const mensagemVazia = document.getElementById("mensagemVazia");
 
-            const tabela = document.getElementById('relatorioProdutos');
-            produtos.forEach(produto => {
-                const row = `
-                    <tr>
-                        <td>${produto.id}</td>
-                        <td>${produto.nome}</td>
-                        <td>${produto.quantidade}</td>
-                        <td>R$ ${produto.preco.to
+            try {
+                const response = await fetch("http://localhost:8080/produtos/relatorio/movimentacao");
+                if (!response.ok) throw new Error("Erro ao buscar dados da API.");
+
+                const relatorio = await response.json();
+
+                if (relatorio.length === 0) {
+                    mensagemVazia.style.display = "block";
+                } else {
+                    tabela.style.display = "table";
+                    mensagemVazia.style.display = "none";
+
+                    relatorio.forEach(item => {
+                        const row = `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td>${item.nome}</td>
+                                <td>${item.quantidadeEntrada}</td>
+                                <td>${item.quantidadeSaida}</td>
+                                <td>${item.quantidadeFinal}</td>
+                            </tr>
+                        `;
+                        tabelaBody.innerHTML += row;
+                    });
+                }
+            } catch (error) {
+                console.error("Erro ao carregar relatório:", error);
+                mensagemVazia.innerText = "Erro ao carregar o relatório. Tente novamente mais tarde.";
+                mensagemVazia.style.display = "block";
+            }
+        }
+
+        function baixarPDF() {
+            window.open("http://localhost:8080/produtos/relatorio/pdf", "_blank");
+        }
+
+        // Carrega o relatório ao iniciar
+        carregarRelatorio();
+    </script>
+</body>
+</html>
